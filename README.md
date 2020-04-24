@@ -2,7 +2,6 @@
 
 Please excuse the mess. This is a work in progress.
 
-
 ### Requirements
 * Please install pyenv and latest stable version of python 3. [TODO: link to docs and also link to special command line instruction]
 
@@ -18,4 +17,4 @@ Please excuse the mess. This is a work in progress.
 * [TODO]
 
 ### NOTES
-* No security guarantees.
+* Security. 
