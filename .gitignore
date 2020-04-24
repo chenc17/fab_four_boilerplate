@@ -1,0 +1,10 @@
+#With help from https://git-scm.com/docs/gitignore
+build/**
+dist/**
+node_modules/**
+python/__pycache__/**
+python/orig/**
+.DS_Store
+python_build/**
+python_dist/**
+python_spec/**
