@@ -1,5 +1,5 @@
 const { ipcRenderer, contextBridge } = require("electron");
-const comm = require('../src/shared/comm.js');
+const comm = require('./comm.js');
 
 
 // Expose protected methods that allow the renderer process to use
@@ -35,6 +35,9 @@ contextBridge.exposeInMainWorld(
         },
         get_view_react_msg: () => {
             return comm.M_VIEW_REACT;
+        },
+        get_react_data_msg: () => {
+            return comm.M_GET_REACT_DATA;
         }
     }
 );

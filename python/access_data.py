@@ -30,6 +30,7 @@ def get_names(conn):
 
 
 if __name__ == '__main__':
+    print('access_data.py')
     db_path = sys.argv[1]
     conn = sqlite3.connect(db_path + '/' + constants.DB_NAME)
     conn.row_factory = sqlite3.Row

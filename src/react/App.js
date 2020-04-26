@@ -1,7 +1,10 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-const comm = require('../shared/comm.js');
+
+const C_TO_MAIN = window.api.get_to_main_channel();
+const C_FROM_MAIN = window.api.get_from_main_channel();
+const M_GET_REACT_DATA = window.api.get_react_data_msg();
 
 class App extends React.Component {
 
@@ -16,12 +19,12 @@ class App extends React.Component {
 
     get_data = () =>
     {
-        let body_send = { msg:comm.M_GET_REACT_DATA, data:[] };
+        let body_send = { msg:M_GET_REACT_DATA, data:[] };
 
-        window.api.send(comm.C_TO_MAIN, body_send);
-        window.api.response(comm.C_FROM_MAIN, (body) =>
+        window.api.send(C_TO_MAIN, body_send);
+        window.api.response(C_FROM_MAIN, (body) =>
         {
-            console.log(`[${comm.C_FROM_MAIN}] [${body.msg}] ${body.data}`);
+            console.log(`[${C_FROM_MAIN}] [${body.msg}] ${body.data}`);
         });
 
     }

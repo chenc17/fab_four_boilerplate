@@ -18,10 +18,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-start": "rm -r python_dist; rm -r python_build; electron .",
+    "electron-start": "rm -r python_build; rm -r python_dist; rm -r python_spec; electron .",
     "pyinstaller_to_db": "pyinstaller -F ./python/to_db.py --workpath ./python_build --distpath ./python_dist --specpath ./python_spec",
     "pyinstaller_access_data": "pyinstaller -F ./python/access_data.py --workpath ./python_build --distpath ./python_dist --specpath ./python_spec",
-    "package-electron": "npm run pyinstaller_to_db; npm run pyinstaller_access_data; electron-builder build --mac --win -c.extraMetadata.main=electron/main.js --publish never"
+    "package-electron": "npm run pyinstaller_to_db; npm run pyinstaller_access_data; electron-builder build --mac --win --x64 --ia32 -c.extraMetadata.main=electron/main.js --publish never"
   },
   "eslintConfig": {
     "extends": "react-app"

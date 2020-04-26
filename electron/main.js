@@ -3,7 +3,7 @@ const path = require('path');
 //const {PythonShell} =  require('python-shell');
 const fs = require('fs');
 const config = require('./config.js');
-const comm = require('../src/shared/comm.js');
+const comm = require('./comm.js');
 
 let python_process = null
 
@@ -72,6 +72,7 @@ function create_python_process(python_file_name, python_args) {
 
     if (guess_packaged())
     {   // If the app has been packaged, use execFile instead of spawn
+        main_window.webContents.send(comm.C_FROM_MAIN, { msg:comm.M_INFO, data:[`About to run ${python_file_path}`]})
         python_process = require('child_process').execFile(python_file_path, args_list);
     }
     else
@@ -96,7 +97,8 @@ function create_python_process(python_file_name, python_args) {
 
     python_process.on('close', (code) =>
     {
-        console.log(`child process exited with code ${code}`);
+        let body = { msg:comm.M_INFO, data:[`child process exited with code ${code}`] };
+        main_window.webContents.send(comm.C_FROM_MAIN, body);
     });
 
     return python_process;
@@ -155,6 +157,9 @@ ipcMain.on(comm.C_TO_MAIN, async (event, body) => {
             let persistent_data_path = app.getPath('userData');
             let python_args = [data_folder_path, db_path];
             create_python_process(config.P_LOAD_DATA_FOLDER_FILE, python_args);
+
+            let body = { msg:comm.M_INFO, data:['CALLED PYTHON SCRIPT'] };
+            main_window.webContents.send(comm.C_FROM_MAIN, body);
         }
         //TODO else?
     }
@@ -168,7 +173,10 @@ ipcMain.on(comm.C_TO_MAIN, async (event, body) => {
     else if (msg===comm.M_GET_REACT_DATA)
     {
         let python_args = [db_path];
-        create_python_process(config.P_GET_REACT_DATA_FILE, python_args)
+        create_python_process(config.P_GET_REACT_DATA_FILE, python_args);
+
+        let body = { msg:comm.M_INFO, data:['CALLED PYTHON SCRIPT'] };
+        main_window.webContents.send(comm.C_FROM_MAIN, body);
 
     }
 });

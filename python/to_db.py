@@ -40,6 +40,7 @@ def main(data_folder_path, db_path):
 
 if __name__ == "__main__":
     #TODO hardening
+    print('to_db.py')
     data_folder_path = sys.argv[1]
     db_path = sys.argv[2]
     main(data_folder_path, db_path)
