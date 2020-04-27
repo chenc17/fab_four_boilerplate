@@ -1,28 +1,34 @@
+/*
+main.js
+*/
+
 const {app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-//const {PythonShell} =  require('python-shell');
 const fs = require('fs');
 const config = require('./config.js');
 const comm = require('./comm.js');
 
+
+//PYTHON PROCESS MANAGEMENT/////////////////////////////////////////////////////
+//inspired by https://github.com/mannidung/electron-python-boilerplate
 let python_process = null
 
 /**
- * Get the path to the python program acting as server
- * @returns Full path to the python server
+ * Get the path to the python program
+ * @returns Full path to the python program
  */
 function get_python_file_path(python_file_name) {
 
     let python_file_path = '';
 
-     // If the python server hasn't been packed, return path to the unpacked .py-file
+     // If the python program hasn't been packed, return path to the unpacked .py-file
     if (!guess_packaged())
     {
         python_file_path = path.join(__dirname, '../', config.PYTHON_DIR, python_file_name + '.py');
     }
     else
     {
-        // Return path to the compiled/packed python server
+        // Return path to the compiled/packed python program
         if (process.platform === 'win32')
         {
             python_file_path = path.join(__dirname, '../', config.PYTHON_DIST_DIR, python_file_name + '.exe');
@@ -31,8 +37,6 @@ function get_python_file_path(python_file_name) {
         {
             python_file_path = path.join(__dirname, '../', config.PYTHON_DIST_DIR, python_file_name);
         }
-
-
     }
     if (config.DEBUG)
     {
@@ -41,22 +45,17 @@ function get_python_file_path(python_file_name) {
     return python_file_path;
   }
 
-
 /**
- * Check if the app has been packaged or not.
- * @returns True if guessed that the app has been packaged.
+ * Guesses whether or not the python program has been packaged.
+ * @returns True if it appears the program has been packaged.
  */
 function guess_packaged() {
-    let fullPath = path.join(__dirname, '../', config.PYTHON_DIST_DIR); // Why does this work?
-    if (config.DEBUG) {
-      console.log("Guess packaged path: " + fullPath);
-    }
+    let fullPath = path.join(__dirname, '../', config.PYTHON_DIST_DIR);
     return fs.existsSync(fullPath);
 }
 
 /**
- * Creates and spawns the python file as a child process of the Node.js application
- * options: TODO
+ * Spawns the python file as a child process of the Node.js application
  * @returns The child process
  */
 function create_python_process(python_file_name, python_args) {
@@ -71,8 +70,7 @@ function create_python_process(python_file_name, python_args) {
 
 
     if (guess_packaged())
-    {   // If the app has been packaged, use execFile instead of spawn
-        main_window.webContents.send(comm.C_FROM_MAIN, { msg:comm.M_INFO, data:[`About to run ${python_file_path}`]})
+    {   //use execFile instead of spawn
         python_process = require('child_process').execFile(python_file_path, args_list);
     }
     else
@@ -82,7 +80,7 @@ function create_python_process(python_file_name, python_args) {
         python_process = require('child_process').spawn('python', args_list);
     }
 
-    // Print stdout and stderr to console
+    // Send stdout and stderr to the main window console
     python_process.stdout.on('data', (data) =>
     {
         let body = { msg:comm.M_SUCCESS, data:[data.toString()] };
@@ -106,7 +104,6 @@ function create_python_process(python_file_name, python_args) {
 
 /**
  * Kills the python process
- * @returns Nothing
  */
 function close_python_process() {
   python_process.kill();
@@ -116,7 +113,7 @@ function close_python_process() {
 app.on('will-quit', close_python_process)
 
 
-//WINDOW MANAGEMENT
+//WINDOW MANAGEMENT////////////////////////////////////////////////////////////
 let main_window;
 
 function createWindow () {
@@ -135,13 +132,13 @@ function createWindow () {
   if (config.DEBUG) {
       main_window.webContents.openDevTools()
   }
-
-
 }
 
 app.whenReady().then(createWindow)
 
+//handle communication coming from renderer.js and React
 ipcMain.on(comm.C_TO_MAIN, async (event, body) => {
+    //this is where the db will live
     let db_path = app.getPath('userData');
 
     let msg = body.msg;
@@ -149,25 +146,23 @@ ipcMain.on(comm.C_TO_MAIN, async (event, body) => {
     if(msg===comm.M_LOAD_DATA)
     {
         let result = await dialog.showOpenDialog(null, {properties: ['openDirectory']})
-        //TODO: hardening
+        //TODO: hardening against malicious input
 
         if(result['filePaths'].length===1)
         {
             let data_folder_path = result['filePaths'][0];
-            let persistent_data_path = app.getPath('userData');
             let python_args = [data_folder_path, db_path];
             create_python_process(config.P_LOAD_DATA_FOLDER_FILE, python_args);
 
-            let body = { msg:comm.M_INFO, data:['CALLED PYTHON SCRIPT'] };
+            let body = { msg:comm.M_INFO, data:['CREATING PYTHON PROCESS'] };
             main_window.webContents.send(comm.C_FROM_MAIN, body);
         }
-        //TODO else?
+        //TODO error message
     }
     else if (msg===comm.M_VIEW_REACT)
     {
         let url = `file://${path.join(__dirname, '../build/index.html')}`;
         //'http://localhost:3000';
-        //`file://${path.join(__dirname, '../build/index.html')}`;
         main_window.loadURL(url);
     }
     else if (msg===comm.M_GET_REACT_DATA)
@@ -175,7 +170,7 @@ ipcMain.on(comm.C_TO_MAIN, async (event, body) => {
         let python_args = [db_path];
         create_python_process(config.P_GET_REACT_DATA_FILE, python_args);
 
-        let body = { msg:comm.M_INFO, data:['CALLED PYTHON SCRIPT'] };
+        let body = { msg:comm.M_INFO, data:['CREATING PYTHON PROCESS'] };
         main_window.webContents.send(comm.C_FROM_MAIN, body);
 
     }

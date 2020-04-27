@@ -1,7 +1,12 @@
+/*
+App.js
+*/
+
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+//get constants to help React communicate with the electron main.js process
 const C_TO_MAIN = window.api.get_to_main_channel();
 const C_FROM_MAIN = window.api.get_from_main_channel();
 const M_GET_REACT_DATA = window.api.get_react_data_msg();
@@ -15,13 +20,14 @@ class App extends React.Component {
         };
     }
 
-
-
     get_data = () =>
     {
         let body_send = { msg:M_GET_REACT_DATA, data:[] };
 
         window.api.send(C_TO_MAIN, body_send);
+        this.setState({
+          info_to_display: 'Check the console for data.',
+        });
         window.api.response(C_FROM_MAIN, (body) =>
         {
             console.log(`[${C_FROM_MAIN}] [${body.msg}] ${body.data}`);
@@ -49,7 +55,5 @@ class App extends React.Component {
 
     }
 }
-
-
 
 export default App;

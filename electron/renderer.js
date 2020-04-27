@@ -1,12 +1,12 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// No Node.js APIs are available in this process because
-// `nodeIntegration` is turned off. Use `preload.js` to
-// selectively enable features needed in the rendering
-// process.
+/*
+renderer.js: This file is required by index.html and is executed
+in the renderer process for that window.
 
-//had to set this script to be a module in order to import the constants--is that ok?
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
+Note that no Node.js APIs are available in this process because
+"nodeIntegration" is turned off.
+Use preload.js to selectively enable features needed in the rendering
+process.
+*/
 
 const C_TO_MAIN = window.api.get_to_main_channel();
 const C_FROM_MAIN = window.api.get_from_main_channel();

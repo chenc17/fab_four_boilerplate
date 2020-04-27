@@ -1,6 +1,5 @@
 /*
-COMMUNICATION CONSTANTS
-Dictionaries of the form { msg:'', data:[] } are send on these channels
+comm.js: communication constants to facilitate communication with main.js
 */
 
 //CHANNEL: TO_MAIN
@@ -17,8 +16,6 @@ const M_INFO = 'info';
 const M_ERROR = 'error';
 const M_SUCCESS = 'success';
 
-//DON'T FORGET TO EXPORT
-// Export the API
 module.exports = {
     C_TO_MAIN,
     M_LOAD_DATA,

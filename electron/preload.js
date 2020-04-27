@@ -1,9 +1,17 @@
+/*
+ preload.js: called by main.js when creating the main window
+ inspired by https://github.com/electron/electron/issues/9920#issuecomment-575839738
+ */
+
+
 const { ipcRenderer, contextBridge } = require("electron");
 const comm = require('./comm.js');
 
+// Expose protected methods that allow the renderer process (and others) to use
+// the ipcRenderer to communicate with main.js
+//'channel' is a channel defined in comm.js
+//'body' is a dictionary of the form { msg:'', data:[] } where 'msg' should be a message defined in comm.js
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     'api', {
         send: (channel, body) => {
